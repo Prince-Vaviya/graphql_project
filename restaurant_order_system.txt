@@ -1,0 +1,110 @@
+================================================================================
+                    RESTAURANT ORDER MANAGEMENT SYSTEM
+================================================================================
+
+GOAL:
+-----
+Create a GraphQL API for a restaurant management system to manage menus,
+customers, orders, and table reservations.
+
+DATABASE MODELS NEEDED:
+-----------------------
+- MenuItem (id, name, description, price, category, available, preparation_time)
+- Category (id, name, description, display_order)
+- Customer (id, name, email, phone, loyalty_points)
+- Table (id, table_number, capacity, location)
+- Order (id, customer_id, table_id, order_date, status, total_amount)
+- OrderItem (id, order_id, menu_item_id, quantity, price_at_order)
+
+HINTS:
+------
+- MenuItem belongs to Category
+- Order has OrderItems linking to MenuItem
+- Track order status: pending, preparing, ready, served, paid
+- Table reservations link customer to table
+
+TEST QUERIES:
+-------------
+# Get menu items by category
+query {
+  categories {
+    id
+    name
+    items {
+      name
+      price
+      available
+    }
+  }
+}
+
+# Get active orders
+query {
+  orders(status: "preparing") {
+    id
+    orderDate
+    table { tableNumber }
+    items {
+      menuItem { name }
+      quantity
+    }
+  }
+}
+
+# Get customer order history
+query {
+  customer(id: 1) {
+    name
+    loyaltyPoints
+    orders {
+      id
+      orderDate
+      totalAmount
+      status
+    }
+  }
+}
+
+TEST MUTATIONS:
+---------------
+# Create new order
+mutation {
+  createOrder(input: {
+    customerId: 1
+    tableId: 1
+    items: [
+      { menuItemId: 1, quantity: 2 }
+      { menuItemId: 5, quantity: 1 }
+    ]
+  }) {
+    order {
+      id
+      orderDate
+      totalAmount
+      status
+    }
+  }
+}
+
+# Update order status
+mutation {
+  updateOrderStatus(input: {
+    orderId: 1
+    status: "ready"
+  }) {
+    order {
+      id
+      status
+    }
+  }
+}
+
+EXPECTED TEST CASES:
+--------------------
+1. Menu displays items organized by category
+2. Unavailable items show as not available
+3. Order creation calculates total correctly
+4. Order status transitions work correctly
+5. Customer loyalty points tracked
+6. Table capacity is enforced
+7. Order history is retrievable by customer
