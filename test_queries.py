@@ -22,6 +22,8 @@ def run_query(query):
         data["data"] = result.data
     return data
 
+
+
 queries = [
     ("Get Categories", """
     query {
